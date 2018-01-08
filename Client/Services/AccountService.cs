@@ -36,8 +36,10 @@ namespace Client.Services
 
         public IRestResponse ChangePassword(string oldPassword, string newPassword, string accessToken)
         {
-            //TODO IMPLEMENT
-            var request = new RestRequest("api/Account/ChangePassword", Method.POST);
+            var request = CreateJsonRestRequest("api/Account/ChangePassword", Method.POST);
+            var body = CreateChangePasswordRequest(oldPassword, newPassword);
+            request.AddHeader("Authorization", $"bearer {accessToken}");
+            request.AddBody(body);
             var response = _restClient.Execute(request);
             return response;
         }
@@ -48,6 +50,16 @@ namespace Client.Services
             {
                 RequestFormat = DataFormat.Json,
                 JsonSerializer = new NewtonsoftJsonSerializer()
+            };
+        }
+
+        private ChangePasswordRequest CreateChangePasswordRequest(string oldPassword, string newPassword)
+        {
+            return new ChangePasswordRequest
+            {
+                OldPassword = oldPassword,
+                NewPassword = newPassword,
+                ConfirmPassword = newPassword
             };
         }
 

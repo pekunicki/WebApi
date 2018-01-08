@@ -7,7 +7,7 @@ namespace Client.Utils
     {
         internal static ChangePassword CreateNewPassword()
         {
-            Logger.LogInfo("Wprowadz nowe haslo dla uzytkownika");
+            Logger.LogInfo(Messages.InputChangePassword);
             var password = Console.ReadLine();
             return new ChangePassword
             {
@@ -15,12 +15,16 @@ namespace Client.Utils
             };
         }
 
-        internal static User CreateNewUser()
+        internal static User CreateUser(bool isNew)
         {
-            Logger.LogInfo("Wprowadz email nowego uzytkownika");
+            var emailMsg = isNew ? Messages.InputNewEmail : Messages.InputEmail;
+            Logger.LogInfo(emailMsg);
             var username = Console.ReadLine();
-            Logger.LogInfo("Podaj haslo nowego uzytkownika");
+
+            var passMsg = isNew ? Messages.InputNewPassword : Messages.InputPassword;
+            Logger.LogInfo(passMsg);
             var password = Console.ReadLine();
+
             return new User
             {
                 Username = username,

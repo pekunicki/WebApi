@@ -11,7 +11,7 @@ namespace Client
         private static void Main(string[] args)
         {
             var authService = new AccountService();
-            var user = CLIHandler.CreateNewUser();
+            var user = CLIHandler.CreateUser(true);
 
             var registerResponse = authService.Register(user.Username, user.Password);
             if (!VerifyResponse(registerResponse, Messages.SuccessRegistrationMsg))
@@ -26,7 +26,15 @@ namespace Client
                 return;
             }
             var changePasswordResponse = ChangePassword(loginResponse.Data.AuthToken, authService, user);
-            if (VerifyResponse(changePasswordResponse, Messages.SuccessChangePasswordMsg))
+            if (!VerifyResponse(changePasswordResponse, Messages.SuccessChangePasswordMsg))
+            {
+                Console.ReadKey();
+                return;
+            }
+
+            var newUser = CLIHandler.CreateUser(false);
+            loginResponse = authService.Login(newUser.Username, newUser.Password);
+            if (!VerifyResponse(loginResponse, Messages.SuccessLoginMsg))
             {
                 Console.ReadKey();
                 return;

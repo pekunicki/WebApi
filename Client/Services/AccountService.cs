@@ -1,4 +1,5 @@
-﻿using Client.Models;
+﻿using System;
+using Client.Models;
 using Client.Utils;
 using RestSharp;
 using RestSharp.Serializers.Newtonsoft.Json;
@@ -18,10 +19,11 @@ namespace Client.Services
         public IRestResponse<TokenResponse> Login(string email, string pass)
         {
             var request = new RestRequest("token", Method.POST);
-            request.AddParameter("grant_type", "password");
-            request.AddParameter("username", email);
-            request.AddParameter("password", pass);
+            CreateLoginRequest(email, pass, request);
+
             var response = _restClient.Execute<TokenResponse>(request);
+            LogNewRequest(request.Resource);
+
             return response;
         }
 
@@ -30,7 +32,9 @@ namespace Client.Services
             var request = CreateJsonRestRequest("api/Account/Register", Method.POST);
             var body = CreateRegisterRequest(email, pass);
             request.AddBody(body);
-            var response = _restClient.Execute(request);
+
+            var response = SendSimpleRequest(request);
+
             return response;
         }
 
@@ -40,8 +44,22 @@ namespace Client.Services
             var body = CreateChangePasswordRequest(oldPassword, newPassword);
             request.AddHeader("Authorization", $"bearer {accessToken}");
             request.AddBody(body);
-            var response = _restClient.Execute(request);
+
+            var response = SendSimpleRequest(request);
+
             return response;
+        }
+
+        private IRestResponse SendSimpleRequest(RestRequest request)
+        {
+            var response = _restClient.Execute(request);
+            LogNewRequest(request.Resource);
+            return response;
+        }
+
+        private void LogNewRequest(string endpoint)
+        {
+            Logger.LogNewInfo($"{DateTime.UtcNow.ToShortTimeString()} - New Request has been sent on /{endpoint}");
         }
 
         private static RestRequest CreateJsonRestRequest(string endpoint, Method httpMethod)
@@ -51,6 +69,13 @@ namespace Client.Services
                 RequestFormat = DataFormat.Json,
                 JsonSerializer = new NewtonsoftJsonSerializer()
             };
+        }
+
+        private static void CreateLoginRequest(string email, string pass, RestRequest request)
+        {
+            request.AddParameter("grant_type", "password");
+            request.AddParameter("username", email);
+            request.AddParameter("password", pass);
         }
 
         private ChangePasswordRequest CreateChangePasswordRequest(string oldPassword, string newPassword)

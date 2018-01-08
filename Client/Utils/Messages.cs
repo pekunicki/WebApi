@@ -8,8 +8,8 @@ namespace Client.Utils
 
         public static string InputNewEmail => "Please, type e-mail for new account:";
         public static string InputNewPassword => "Please, type password for new account:";
-        public static string InputEmail => "Please, type e-mail for you account:";
-        public static string InputPassword => "Please, type password for you account:";
+        public static string InputEmail => "Please, type e-mail for your account:";
+        public static string InputPassword => "Please, type password for your account:";
         public static string InputChangePassword => "Please, type a new password for your account:";
     }
 }

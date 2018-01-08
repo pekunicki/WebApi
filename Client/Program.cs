@@ -11,7 +11,7 @@ namespace Client
         private static void Main(string[] args)
         {
             var authService = new AccountService();
-            var user = CLIHandler.CreateNewUser();
+            var user = CLIHandler.CreateUser();
 
             var registerResponse = authService.Register(user.Username, user.Password);
             if (!VerifyResponse(registerResponse, Messages.SuccessRegistrationMsg))

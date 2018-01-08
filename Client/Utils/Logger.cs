@@ -26,5 +26,11 @@ namespace Client.Utils
         {
             Log(ConsoleColor.Green, message);
         }
+
+        public static void LogNewInfo(string message)
+        {
+            Log(ConsoleColor.Cyan, message);
+
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Client.Models;
+﻿using System;
+using Client.Models;
 using Client.Utils;
 using RestSharp;
 using RestSharp.Serializers.Newtonsoft.Json;
@@ -18,10 +19,9 @@ namespace Client.Services
         public IRestResponse<TokenResponse> Login(string email, string pass)
         {
             var request = new RestRequest("token", Method.POST);
-            request.AddParameter("grant_type", "password");
-            request.AddParameter("username", email);
-            request.AddParameter("password", pass);
+            CreateLoginRequest(email, pass, request);
             var response = _restClient.Execute<TokenResponse>(request);
+            LogNewRequest(request.Resource);
             return response;
         }
 
@@ -30,15 +30,17 @@ namespace Client.Services
             var request = CreateJsonRestRequest("api/Account/Register", Method.POST);
             var body = CreateRegisterRequest(email, pass);
             request.AddBody(body);
-            var response = _restClient.Execute(request);
+            var response = SendSimpleRequest(request);
             return response;
         }
 
         public IRestResponse ChangePassword(string oldPassword, string newPassword, string accessToken)
         {
             //TODO IMPLEMENT
-            var request = new RestRequest("api/Account/ChangePassword", Method.POST);
-            var response = _restClient.Execute(request);
+            var request = CreateJsonRestRequest("api/Account/ChangePassword", Method.POST);
+
+            var response = SendSimpleRequest(request);
+
             return response;
         }
 
@@ -51,6 +53,13 @@ namespace Client.Services
             };
         }
 
+        private static void CreateLoginRequest(string email, string pass, RestRequest request)
+        {
+            request.AddParameter("grant_type", "password");
+            request.AddParameter("username", email);
+            request.AddParameter("password", pass);
+        }
+
         private static RegisterRequest CreateRegisterRequest(string email, string pass)
         {
             return new RegisterRequest
@@ -59,6 +68,18 @@ namespace Client.Services
                 Password = pass,
                 ConfirmPassword = pass
             };
+        }
+
+        private IRestResponse SendSimpleRequest(RestRequest request)
+        {
+            var response = _restClient.Execute(request);
+            LogNewRequest(request.Resource);
+            return response;
+        }
+
+        private void LogNewRequest(string endpoint)
+        {
+            Logger.LogNewInfo($"{DateTime.UtcNow.ToShortTimeString()} - New Request has been sent on /{endpoint}");
         }
     }
 }
